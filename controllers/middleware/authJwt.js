@@ -8,14 +8,14 @@ verifyToken = (req, res, next) => {
 
   if (!token) {
     return res.status(403).send({
-      message: "No token provided!"
+      message: "Unauthorized Access - No Token Provided!"
     });
   }
 
   jwt.verify(token, process.env.secret, (err, decoded) => {
     if (err) {
       return res.status(401).send({
-        message: "Unauthorized Access!"
+        message: "Unauthorized Access - Invalid Token Provided!"
       });
     }
     req.userId = decoded.id;
