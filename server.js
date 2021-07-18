@@ -2,7 +2,6 @@ const express= require('express');
 const cors = require("cors");
 const app=express();
 const dotenv=require('dotenv');
-// const jwt=require('jsonwebtoken');
 
 
 dotenv.config();
@@ -16,13 +15,21 @@ var corsOptions = {
 
 
 // Import Routes
-const authRoute=require('./routes/auth');
+const WelcomeRoute=require('./routes/welcomeRoute');
+const authRoute=require('./routes/authRoute');
+const UserauthRoute=require('./routes/userRoute');
+const StaffauthRoute=require('./routes/staffRoute');
+const AdminauthRoute=require('./routes/adminRoute');
 
 //Middlewares
 app.use(express.json());
 
 //Route Middlewares
+app.use('/api',WelcomeRoute);
 app.use('/api/auth',authRoute);
+app.use('/api/user',UserauthRoute);
+app.use('/api/staff',StaffauthRoute);
+app.use('/api/admin',AdminauthRoute);
 
 const db = require("./models");
 const Role = db.role;
