@@ -1,8 +1,13 @@
 const db = require("../../models");
+const {registerValidation,loginValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
+  const { error } = registerValidation(req.body);
+  if(error) return res.status(400).json({ message: error.details[0].message});
+  console.log(error);
+
   // Username
   User.findOne({
     where: {

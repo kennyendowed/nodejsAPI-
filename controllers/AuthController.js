@@ -1,5 +1,5 @@
 const db = require("../models");
-// const config = require("../config/auth.config");
+const {registerValidation,loginValidation} = require("./helpers/validate");
 const User = db.user;
 const Role = db.role;
 
@@ -9,6 +9,8 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
+
+
   // Save User to Database
   User.create({
     name: req.body.name,
