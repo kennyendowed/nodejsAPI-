@@ -1,4 +1,6 @@
 const Joi=require('@hapi/joi');
+const customJoi = Joi.extend(require("joi-age"));
+
 
 //Register validation
 const registerValidation= (data) =>{
