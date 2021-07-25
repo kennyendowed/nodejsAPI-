@@ -8,7 +8,10 @@ const registerValidation= (data) =>{
         email: Joi.string().min(6).email().required(),
         phone: Joi.number().required(),
         birthyear: Joi.number().integer().min(1970).max(2013), 
-        password: Joi.string().uppercase().lowercase().min(3).max(15).required().label('Password'),
+        password: Joi.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,'password').min(6).max(15).required().messages({
+            'string.pattern.base': '{{#label}} with value {:[.]} fails to match the required pattern: {{#regex}}',
+            'string.pattern.name': '{{#label}} with value {:[.]} fails to match the {{#name}} pattern {{#label}} must contain at least 1 lower-case and capital letter, a number and symbol',
+          }),       
         password_confirmation: Joi.any().equal(Joi.ref('password'))
             .required()
             .label('Confirm password')
@@ -22,7 +25,10 @@ const registerValidation= (data) =>{
 const loginValidation= (data) =>{
     const schema =Joi.object({
         email: Joi.string().min(6).email().required(),
-        password: Joi.string().min(8).required(),
+        password: Joi.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,'password').min(6).max(15).required().messages({
+            'string.pattern.base': '{{#label}} with value {:[.]} fails to match the required pattern: {{#regex}}',
+            'string.pattern.name': '{{#label}} with value {:[.]} fails to match the {{#name}} pattern {{#label}} must contain at least 1 lower-case and capital letter, a number and symbol',
+          }),       
     });
    
        return schema.validate(data);
