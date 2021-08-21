@@ -1,5 +1,5 @@
 const db = require("../../models");
-const {registerValidation,loginValidation} = require("../helpers/validate");
+const {registerValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 
