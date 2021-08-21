@@ -25,6 +25,7 @@ const AdminauthRoute=require('./routes/adminRoute');
 app.use(express.json());
 
 //Route Middlewares
+app.use('/',WelcomeRoute);
 app.use('/api',WelcomeRoute);
 app.use('/api/auth',authRoute);
 app.use('/api/user',UserauthRoute);
