@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const { authJwt } = require("../controllers/middleware");
-const controller = require("../controllers/UserController");
+const { authJwt } = require("../../controllers/middleware");
+const controller = require("../../controllers/UserController");
 
 router.use(function(req, res, next) {
     res.header(
       "Access-Control-Allow-Headers",
-      "X-Authorization, Origin, Content-Type, Accept"
+      "X-Authorization,Authorization, Origin, Content-Type, Accept"
     );
     next();
   });
@@ -18,12 +18,12 @@ router.get("/",(req,res)=>{
 });
 
 
-router.get(
-  "staff",
-  [authJwt.verifyToken, authJwt.isStaff],
-  controller.staffBoard
-);
 
+router.get(
+  "admin",
+  [authJwt.verifyToken, authJwt.isAdmin],
+  controller.adminBoard
+);
 
 
 

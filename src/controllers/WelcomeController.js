@@ -1,8 +1,11 @@
 exports.allAccess = (req, res) => {
-      res.status(200).json({
-        message:"Welcome to Nodejs Api Engine application.",
-        status:  "200"
-    });
+  res.status(200).json({
+    status :  'TRUE',
+    data:[{
+      code:  200,
+      data: "Welcome to Nodejs Api Engine Application.......",
+       }]
+      })    
 
 };
 

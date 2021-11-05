@@ -5,9 +5,15 @@ const User = db.user;
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
   const { error } = registerValidation(req.body);
-  if(error) return res.status(400).json({ message: error.details[0].message});
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
   console.log(error);
-
+//  const userexists = await User.findOne({ where: {username: req.body.username ,email: req.body.email } });
   // Username
   User.findOne({
     where: {
@@ -16,7 +22,11 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
   }).then(user => {
     if (user) {
       res.status(400).send({
-        message: "Failed! Username is already in use!"
+        status :  'FALSE',
+        data:[{
+          code:  400,
+          message: "Failed! Username is already in use!",
+           }]       
       });
       return;
     }
@@ -29,7 +39,12 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
     }).then(user => {
       if (user) {
         res.status(400).send({
-          message: "Failed! Email is already in use!"
+          status :  'FALSE',
+          data:[{
+            code:  400,
+            message: "Failed! Email is already in use!",
+             }]
+         
         });
         return;
       }
@@ -44,7 +59,12 @@ checkRolesExisted = (req, res, next) => {
     for (let i = 0; i < req.body.roles.length; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
         res.status(400).send({
-          message: "Failed! Role does not exist = " + req.body.roles[i]
+          status :  'FALSE',
+          data:[{
+            code:  400,
+            message: "Failed! Role does not exist = " + req.body.roles[i],
+             }]
+         
         });
         return;
       }

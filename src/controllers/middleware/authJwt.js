@@ -1,26 +1,125 @@
 const jwt = require("jsonwebtoken");
 const db = require("../../models");
 const User = db.user;
+const User_Login = db.User_Login;
+const Blacklist_Token = db.Blacklist_Token;
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["X-Authorization"];
+  let token =  req.headers["x-authorization"] || req.headers["authorization"];
 
   if (!token) {
     return res.status(403).send({
-      message: "Unauthorized Access - No Token Provided!"
+      status :  'FALSE',
+      data:[{
+        code:  403,
+        message: "Unauthorized Access - No Token Provided!"
+         }]        
     });
+  
   }
 
-  jwt.verify(token, process.env.secret, (err, decoded) => {
-    if (err) {
+  Blacklist_Token.findOne({ where: {token: token } })
+  .then((found) => {
+        
+    if (found){
       return res.status(401).send({
-        message: "Unauthorized Access - Invalid Token Provided!"
+        status :  'FALSE',
+        data:[{
+          code:  401,
+          message: "Token blacklisted. Cannot use this token"
+           }]        
       });
     }
-    req.userId = decoded.id;
-    next();
+    else {
+  
+      jwt.verify(token, process.env.SECRET, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({
+            status :  'FALSE',
+            data:[{
+              code:  401,
+              message: "Unauthorized Access - Invalid Token Provided!"
+               }]        
+          });
+        }
+        req.userId = decoded.id;
+        next();
+      });
+    }
+ 
   });
+ 
 };
+
+logotToken = (req, res, next) => {
+  let Atoken = req.headers["x-authorization"] || req.headers["authorization"];
+  const token = Atoken && Atoken.split(' ')[1];
+  if (!token) {
+    return res.status(403).send({
+      status :  'FALSE',
+      data:[{
+        code:  403,
+        message: "Unauthorized Access - No Token Provided!"
+         }]        
+    });
+  
+  }
+
+  Blacklist_Token.findOne({ where: {token: token } })
+  .then((found) => {
+       
+    if (found){
+      return res.status(401).send({
+        status :  'FALSE',
+        data:[{
+          code:  401,
+          message: "Token blacklisted. Cannot use this token"
+           }]        
+      });
+    }
+    else {
+ 
+      jwt.verify(token, process.env.SECRET, async (err, decoded) => {
+      //  console.log(err)
+      //  console.log(decoded)
+        if (err){
+          return res.status(403).send({
+            status :  'FALSE',
+            data:[{
+              code:  403,
+              message: "Unauthorized Access - No Token Provided!"
+               }]        
+          });
+        }
+     
+        if(decoded){
+          const login = await User_Login.findOne({where:{ user_id : decoded.id}})
+          login.logged_out=true;
+          login.token_deleted=true;
+          await login.save();
+           if(login.token_deleted==true){
+            const blacklist_token = Blacklist_Token.create({
+              token:token
+            });
+            return res.status(401).send({
+              status :  'FALSE',
+              data:[{
+                code:  401,
+                message: "Token blacklisted. Cannot use this token"
+                 }]        
+            });
+          }
+        }
+        req.user = decoded;
+        next();
+      });
+   
+    }
+ 
+  });
+ 
+};
+
 
 isAdmin = (req, res, next) => {
   User.findByPk(req.userId).then(user => {
@@ -81,6 +180,7 @@ isStaffOrAdmin = (req, res, next) => {
 
 const authJwt = {
   verifyToken: verifyToken,
+  logotToken:logotToken,
   isAdmin: isAdmin,
   isStaff: isStaff,
   isStaffOrAdmin: isStaffOrAdmin
