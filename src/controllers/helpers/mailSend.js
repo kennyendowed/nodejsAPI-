@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
+const path = require('path')
 
 let transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
@@ -11,22 +12,21 @@ let transporter = nodemailer.createTransport({
       pass: process.env.MAIL_PASSWORD 
     },
   });
-  transporter.use('compile', hbs({
-    viewEngine: 'express-handlebars',
-    viewPath:  __dirname + '/../../views/mails/'
-}));
 
-// const auth = {
-//     auth: {
-//         api_key: process.env.API_KEY ||  'MAIL_GUN_API_KEY', // TODO: Replace with your mailgun API KEY
-//         domain: process.env.DOMAIN || 'MAIL_GUN_DOMAIN' // TODO: Replace with your mailgun DOMAIN
-//     }
-// };
+  // point to the template folder
+const handlebarOptions = {
+  viewEngine: {
+      partialsDir: path.resolve('./views/mails/'),
+      defaultLayout: false,
+  },
+  viewPath: path.resolve('./views/mails/'),
+};
 
-//const transporter = nodemailer.createTransport(mailGun(auth));
+// use a template file with nodemailer
+transporter.use('compile', hbs(handlebarOptions))
 
 
-const sendMail = (email, subject, text, cb) => {
+const sendMail = (template,name,email, subject, text, cb) => {
     const mailOptions = {
         from:process.env.MAIL_FROM_ADDRESS, // TODO: email sender
       replyTo:process.env.MAIL_REPLY_TO,
@@ -35,10 +35,13 @@ const sendMail = (email, subject, text, cb) => {
       bbc:"kennygendowed@gmail.com",
       subject: subject,
       text: text,
-      template: 'index',
+      template: template,
       context: {
-        name: 'Accime Esterling'
-    } // send extra values to template
+        name: name,
+        message:text
+    } ,
+    attachments: [{ filename: "logo.png", path: "./assets/logo.png" }],
+    // send extra values to template
     };
 
     transporter.sendMail(mailOptions, function (err, data) {

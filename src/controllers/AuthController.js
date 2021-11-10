@@ -1,6 +1,7 @@
 const db = require("../models");
 var customId = require("custom-id");
 const nodemailer = require('nodemailer');
+const utils = require('./helpers/utils');
 const sendMail = require('./helpers/mailSend');
 const User_Login = db.User_Login;
 const User = db.user;
@@ -10,17 +11,28 @@ const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const crypto = require('crypto');
+
 
 exports.signup = (req, res) => {
   // generate token and save
-  var token = crypto.randomBytes(16).toString('hex');
-           
-  // Save User to Database
+ // var token =utils.token(4,'numeric'); 
+ var minutesToAdd=5;
+ var currentDate = new Date();
+
+var futureDate = new Date(currentDate.getTime() + minutesToAdd*60000 )
+ console.log(futureDate)
+
+
+
+  var token =utils.randomPin(4); 
+  // // Save User to Database
   // User.create({
   //   name: req.body.name,
   //   username: req.body.username,
   //   email: req.body.email,
+  //   email_time:future,
+  //   email_code:token,
+  //   email_verify: 0,
   //   password: bcrypt.hashSync(req.body.password, 8)
   // })
   //   .then(user => {
@@ -56,39 +68,39 @@ exports.signup = (req, res) => {
   //       //});
   //     }
 
-     var  text= 'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' +req.body.email + '\/' + token + '\n\nThank You!\n' ;
-    sendMail( req.body.email,'Account Verification Link', text, function(err, data) {
-        console.log(err)
-      if (err) {
-        return res.status(500).send({
-          status :  'FALSE',
-          data:[{
-            code:  500,
-            message: err.message || "Technical Issue!, Please click on resend for verify your Email."
-             }]        
-        });
+  //    var  text= 'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' +req.body.email + '\/' + token + '\n\nThank You!\n' ;
+  //   sendMail('index',req.body.name , req.body.email,'Account Verification Link', text, function(err, data) {
+  //       console.log(err)
+  //     if (err) {
+  //       return res.status(500).send({
+  //         status :  'FALSE',
+  //         data:[{
+  //           code:  500,
+  //           message: err.message || "Technical Issue!, Please click on resend for verify your Email."
+  //            }]        
+  //       });
        
-      }
-        res.status(200).send({ 
-            status :  'TRUE',
-            data:[{
-              code:  200,
-              data: 'A verification email has been sent to ' + req.body.email+ '. It will be expire after one day. If you not get verification Email click on resend token',
-               }]
-               });
-  });
+  //     }
+  //       res.status(200).send({ 
+  //           status :  'TRUE',
+  //           data:[{
+  //             code:  200,
+  //             data: 'A verification email has been sent to ' + req.body.email+ '. It will be expire after one day. If you not get verification Email click on resend token',
+  //              }]
+  //              });
+  // });
 
-    // })
-    // .catch(err => {
-    //   res.status(400).send({ 
-    //     status :  'FALSE',
-    //     data:[{
-    //       code:  400,
-    //       message: err.message 
-    //        }]   
+  //   })
+  //   .catch(err => {
+  //     res.status(400).send({ 
+  //       status :  'FALSE',
+  //       data:[{
+  //         code:  400,
+  //         message: err.message 
+  //          }]   
 
-    //    });
-    // });
+  //      });
+  //   });
 };
 
 exports.signin = (req, res) => {
