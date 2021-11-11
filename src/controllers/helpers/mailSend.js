@@ -28,7 +28,7 @@ transporter.use('compile', hbs(handlebarOptions))
 
 const sendMail = (template,name,email, subject, text, cb) => {
     const mailOptions = {
-        from:process.env.MAIL_FROM_ADDRESS, // TODO: email sender
+      from:process.env.APP_NAME, // TODO: email sender
       replyTo:process.env.MAIL_REPLY_TO,
       to:  email, // TODO: email receiver
       cc: "kennyendowed@hotmail.com",
@@ -46,9 +46,9 @@ const sendMail = (template,name,email, subject, text, cb) => {
 
     transporter.sendMail(mailOptions, function (err, data) {
         if (err) {
-            return cb(err, null);
+            return err;
         }
-        return cb(null, data);
+        return  data;
     });
 }
 

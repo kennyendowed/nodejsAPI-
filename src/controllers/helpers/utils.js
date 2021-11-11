@@ -54,6 +54,22 @@ function token(length,type) {
      return token;
 }
 
+function formatTime(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour "0" should be "12"
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    var strTime = hours + ":" + minutes + " " + ampm;
+    return  strTime;
+  }
+
+  function formatDate(date) {
+   // return date.getDate() + "/" + new Intl.DateTimeFormat('en', { month: 'short' }).format(date) + "/" + date.getFullYear() + " " + strTime;
+    return date.getDate() + '/' + (date.getMonth()+1) + '/' +  date.getFullYear();
+  }
+
 function randomPin(length){
     var a = Math.floor(100000 + Math.random() * 900000);   
     a = String(a);
@@ -61,4 +77,4 @@ function randomPin(length){
    
 }
 
- module.exports = { token, randomPin};
+ module.exports = {formatDate, formatTime,token, randomPin};
