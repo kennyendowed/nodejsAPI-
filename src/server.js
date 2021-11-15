@@ -15,28 +15,14 @@ var corsOptions = {
 
   app.use(cors(corsOptions));
 
- 
-
-
-// Import Routes
-const WelcomeRoute=require('./routes/welcomeRoute');
-const authRoute=require('./routes/authentication/authRoute');
-const UserauthRoute=require('./routes/users/userRoute');
-const StaffauthRoute=require('./routes/staff/staffRoute');
-const AdminauthRoute=require('./routes/admin/adminRoute');
-
 //Middlewares
 app.use(express.json());
 
-//Route Middlewares
-app.use('/',WelcomeRoute);
-app.use('/api',WelcomeRoute);
-app.use('/api/auth',authRoute);
-app.use('/api/user',UserauthRoute);
-app.use('/api/staff',StaffauthRoute);
-app.use('/api/admin',AdminauthRoute);
 
 
+//=== 1 - CONFIGURE ROUTES
+//Configure Route
+require('./routes/index')(app);
 
 // const server = http.createServer(app);
 

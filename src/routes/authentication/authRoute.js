@@ -30,4 +30,15 @@ router.use(function(req, res, next) {
 
 //Get user details via token
 router.get("/me", [authJwt.verifyToken], controller.tokenDetails);
+
+
+
+
+
+
+
+
+
+
+
 module.exports=router;

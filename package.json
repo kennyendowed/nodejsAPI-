@@ -25,6 +25,7 @@
     "nodemailer-express-handlebars": "^4.0.0",
     "nodemon": "^2.0.12",
     "sequelize": "^6.6.5",
+    "smtp": "^0.1.4",
     "socket.io": "^4.1.3"
   }
 }

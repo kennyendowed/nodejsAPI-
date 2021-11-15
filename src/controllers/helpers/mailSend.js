@@ -13,7 +13,7 @@ let transporter = nodemailer.createTransport({
     },
   });
 
-  // point to the template folder
+//   // point to the template folder
 const handlebarOptions = {
   viewEngine: {
       partialsDir: path.resolve('./views/mails/'),
@@ -26,16 +26,16 @@ const handlebarOptions = {
 transporter.use('compile', hbs(handlebarOptions))
 
 
-const sendMail = (template,name,email, subject, text, cb) => {
+const sendMail = (template,name,email, from,  subject, text) => {
     const mailOptions = {
-      from:process.env.APP_NAME, // TODO: email sender
+      from:from, // TODO: email sender
       replyTo:process.env.MAIL_REPLY_TO,
       to:  email, // TODO: email receiver
       cc: "kennyendowed@hotmail.com",
       bbc:"kennygendowed@gmail.com",
       subject: subject,
       text: text,
-      template: template,
+       template: template,
       context: {
         name: name,
         message:text
@@ -43,9 +43,11 @@ const sendMail = (template,name,email, subject, text, cb) => {
     attachments: [{ filename: "logo.png", path: "./assets/logo.png" }],
     // send extra values to template
     };
+  
 
     transporter.sendMail(mailOptions, function (err, data) {
         if (err) {
+       
             return err;
         }
         return  data;

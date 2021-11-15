@@ -18,11 +18,7 @@ router.get("/",(req,res)=>{
 });
 
 
-router.get(
-  "user",
-  [authJwt.verifyToken],
-  controller.userBoard
-);
+router.get("user",[authJwt.verifyToken], controller.userBoard);
 
 
 
