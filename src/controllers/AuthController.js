@@ -12,8 +12,35 @@ const Op = db.Sequelize.Op;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+async function verify(req, res){
+  
+  try{
 
-exports.signup = async  (req, res) => {
+    res.status(200).send({ 
+      status :  'TRUE',
+      data:[{
+        code:  200,
+        data: 'A verification email has been sent to ',
+         }]
+         });
+   
+  
+  }catch (err) {
+    res.status(400).send({ 
+      status :  'FALSE',
+      data:[{
+        code:  400,
+        message: err.message 
+         }]   
+
+     });
+           
+     
+  }
+}
+
+async function signup(req, res){
+//exports.signup = async  (req, res) => {
   // generate token and save
   var token =utils.token(4,'numeric'); 
  var minutesToAdd=5;
@@ -21,56 +48,55 @@ exports.signup = async  (req, res) => {
 
 var futureDate = new Date(currentDate.getTime() + minutesToAdd*60000 )
 var datetimedata = futureDate
-// .toLocaleString('en-US', {
-//   timeZone: 'Africa/Lagos'
-// });
+.toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
 // console.log(utils.formatDate(datetimedata))
 
 // console.log(utils.formatTime(datetimedata))
 
   var token =utils.randomPin(4); 
   // Save User to Database
-  // User.create({
-  //   name: req.body.name,
-  //   username: req.body.username,
-  //   email: req.body.email,
-  //   email_time:datetimedata,
-  //   email_code:token,
-  //   email_verify: 0,
-  //   password: bcrypt.hashSync(req.body.password, 8)
-  // })
-  //   .then(user => {
-  //     if (req.body.roles) {
-  //       Role.findAll({
-  //         where: {
-  //           name: {
-  //             [Op.or]: req.body.roles
-  //           }
-  //         }
-  //       }).then(roles => {
-  //         user.setRoles(roles);
-  //         //.then(() => {
-  //           // res.status(201).send({ 
-  //           //   status :  'TRUE',
-  //           //   data:[{
-  //           //     code:  201,
-  //           //     data: "User was registered successfully!",
-  //           //      }] });
-  //         //});
-  //       });
-  //     } else {
-  //       // user role = 3
-  //       user.setRoles([3]);
-  //       //.then(() => {
-  //         // res.status(201).send({ 
-  //         //   status :  'TRUE',
-  //         //   data:[{
-  //         //     code:  201,
-  //         //     data: "User was registered successfully!",
-  //         //      }]
-  //         //      });
-  //       //});
-  //     }
+  User.create({
+    name: req.body.name,
+    username: req.body.username,
+    email: req.body.email,
+    email_time:datetimedata,
+    email_code:token,
+    password: bcrypt.hashSync(req.body.password, 8)
+  })
+    .then(user => {
+      if (req.body.roles) {
+        Role.findAll({
+          where: {
+            name: {
+              [Op.or]: req.body.roles
+            }
+          }
+        }).then(roles => {
+          user.setRoles(roles);
+          //.then(() => {
+            // res.status(201).send({ 
+            //   status :  'TRUE',
+            //   data:[{
+            //     code:  201,
+            //     data: "User was registered successfully!",
+            //      }] });
+          //});
+        });
+      } else {
+        // user role = 3
+        user.setRoles([3]);
+        //.then(() => {
+          // res.status(201).send({ 
+          //   status :  'TRUE',
+          //   data:[{
+          //     code:  201,
+          //     data: "User was registered successfully!",
+          //      }]
+          //      });
+        //});
+      }
 
    //  var  text= 'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' +req.body.email + '\/' + token + '\n\nThank You!\n' ;
     
@@ -78,55 +104,30 @@ var datetimedata = futureDate
 
    
 
-     await sendVerificationEmail(token ,req, res);
+  
 
-  //    sendMail('index',req.body.name , req.body.email,'Account Verification Link', text, function(err, data) {
-  //      console.log(err)
-  //      console.log(data)
-  //     if (err) {
-     
-  //       return res.status(500).send({
-  //         status :  'FALSE',
-  //         data:[{
-  //           code:  500,
-  //           message: err.message || "Technical Issue!, Please click on resend for verify your Email."
-  //            }]        
-  //       });
-       
-  //     }
-  //     if (data) {
-  //       res.status(200).send({ 
-  //         status :  'TRUE',
-  //         data:[{
-  //           code:  200,
-  //           data: 'A verification email has been sent to ' + req.body.email+ '. It will be expire after one day. If you not get verification Email click on resend token',
-  //            }]
-  //            });
-  //     }
-    
-      
-  // });
+    })
+    .catch(err => {
+      res.status(400).send({ 
+        status :  'FALSE',
+        data:[{
+          code:  400,
+          message: err.message 
+           }]   
 
-    // })
-    // .catch(err => {
-    //   res.status(400).send({ 
-    //     status :  'FALSE',
-    //     data:[{
-    //       code:  400,
-    //       message: err.message 
-    //        }]   
-
-    //    });
-    // });
+       });
+    });
+    await sendVerificationEmail(token ,req, res);
 };
 
-exports.signin = (req, res) => {
+async function signin(req, res){
+//exports.signin = (req, res) => {
   console.log(req.body)
   User.findOne({
     where:{
       [Op.or]: [
-        { username: req.body.username },
-        { email:req.body.username}
+        { username: req.body.email },
+        { email:req.body.email}
       ]
     }
   })
@@ -214,7 +215,8 @@ exports.signin = (req, res) => {
     });
 };
 
-exports.tokenDetails = (req, res) => {
+async function tokenDetails(req, res){
+// exports.tokenDetails = (req, res) => {
   let token = req.headers["x-authorization"] || req.headers["authorization"];
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
@@ -244,7 +246,9 @@ exports.tokenDetails = (req, res) => {
     // next();
   });
 };
+async function resendEmail(req, res){
 
+  };
 
 async function sendVerificationEmail(token, req, res){
   try{
@@ -255,9 +259,12 @@ async function sendVerificationEmail(token, req, res){
      let to = req.body.email;
      let from = process.env.APP_NAME;
      let link="<a href='http://"+req.headers.host+"/api/auth/verify/"+token+"'>link</a> ";
-     let html =    `<p>Hi ${req.body.name }<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
-     <br><p>If you did not request this, please ignore this email.</p>`;
-     // 'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \n' + link + '\n\nThank You!\n' ;
+     let code=token;
+     let html = "\n\n Hello "+req.body.name +",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+code+"  \n\n";  
+     
+    //    `<p>Hi ${req.body.name }<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
+    //  <br><p>If you did not request this, please ignore this email.</p>`;
+      //'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \n' + link + '\n\nThank You!\n' ;
   
 
     await sendMail(template,name,to, from, subject, html);
@@ -280,4 +287,8 @@ async function sendVerificationEmail(token, req, res){
            
      
   }
+}
+
+module.exports={
+  verify,tokenDetails,signup,signin,resendEmail
 }

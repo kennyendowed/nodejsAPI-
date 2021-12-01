@@ -23,11 +23,13 @@ router.use(function(req, res, next) {
     controller.signup
   );
 //Login user
-  router.post("/signin", controller.signin);
-
+  router.post("/signin",[verifySignUp.Verifysignin], controller.signin);
+  //verify user account
+  router.post("/verify",[verifySignUp.verifyOtp], controller.verify);
+    //re-send-otp 
+    router.post("/re-send-otp",[verifySignUp.verifyResendOtp], controller.resendEmail);
   //Logout user
   router.post("/logout", [authJwt.logotToken]);
-
 //Get user details via token
 router.get("/me", [authJwt.verifyToken], controller.tokenDetails);
 

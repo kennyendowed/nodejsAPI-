@@ -11,7 +11,11 @@ router.use(function(req, res, next) {
   });
 
 router.get("/", controller.allAccess);
+ //encrypt user data
+ router.post("/encrypt", controller.encrypt);
 
+  //encrypt user data
+  router.post("/dencrypt", controller.dencrypt);
 
 
 

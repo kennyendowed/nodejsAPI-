@@ -22,6 +22,19 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    email_code: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    email_time: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    email_verify: {
+      type: Sequelize.BIGINT,
+      allowNull: true,
+      defaultValue:0
+    },
     resetPasswordToken: {
       type: Sequelize.STRING,
       allowNull: true,

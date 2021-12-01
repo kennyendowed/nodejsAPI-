@@ -31,7 +31,7 @@ const registerValidation= (data) =>{
 //Login validation
 const loginValidation= (data) =>{
     const schema =Joi.object({
-        email: Joi.string().min(6).email().required(),
+        email: Joi.string().min(6).required(),
         password: Joi.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,'password').min(6).max(15).required().messages({
             'string.pattern.base': '{{#label}} with value {:[.]} fails to match the required pattern: {{#regex}}',
             'string.pattern.name': '{{#label}} with value {:[.]} fails to match the {{#name}} pattern {{#label}} must contain at least 1 lower-case and capital letter, a number and symbol',
@@ -41,9 +41,33 @@ const loginValidation= (data) =>{
        return schema.validate(data);
 }
 
+//Otp validation
+const otpValidation= (data) =>{
+  const schema =Joi.object({
+      code: Joi.string().required()
+      .messages({
+      "string.empty": `hello {{#label}} cannot be an empty field`,
+      'any.required': 'chief {{#label}} is required',
+        }),       
+  });
+ 
+     return schema.validate(data);
+}
 
 
+//ResendOtp Validation
+const ResendOtpValidation =(data)=>{
+  const schema =Joi.object({
+    email: Joi.string().min(6).email().required(),     
+});
+
+   return schema.validate(data);
+}
 
 
-module.exports.registerValidation= registerValidation;
-module.exports.loginValidation= loginValidation;
+module.exports={
+  registerValidation,loginValidation,otpValidation,ResendOtpValidation
+}
+// module.exports.registerValidation= registerValidation;
+// module.exports.loginValidation= loginValidation;
+// module.exports.otpValidation=otpValidation;
