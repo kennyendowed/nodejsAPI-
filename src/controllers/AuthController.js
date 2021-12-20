@@ -102,7 +102,14 @@ async function signup(req, res){
 
        });
     });
-    await sendVerificationEmail(token ,req, res);
+    values = {
+      email:req.body.email,
+      name:req.body.name
+  
+    };
+          let title="Account Verification Token";
+        let message = "\n\n Hello "+req.body.name+",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+token+"  \n\n";  
+         sendVerificationEmail(token ,values, res ,title,message);
 };
 
 async function signin(req, res){
@@ -276,31 +283,76 @@ async function resendEmail(req, res){
           name:user.name
       
         };
-      
-         sendVerificationEmail(token ,values, res);
+        let title="Account Verification Token";
+        let message = "\n\n Hello "+user.name +",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+token+"  \n\n";  
+         sendVerificationEmail(token ,values, res ,title,message);
     });
  
   };
 
-async function sendVerificationEmail(token, req, res){
+  async function resetPassowrdLink(req, res){
+    let values = {};
+     var token =utils.randomPin(4); 
+    User.findOne({
+      where:{
+        [Op.or]: [
+           { email:req.body.email}
+        ]
+      }
+    })
+      .then(user => {    
+         if (!user) {
+          return res.status(404).send({
+            status :  'FALSE',
+            data:[{
+              code:  404,
+              message: req.body.email+' account is not register with us please check email again or create a new account',
+               }]
+  
+            });
+        }
+        else{
+         let setTime =utils.addMinutes();
+          user.update(
+            {
+              email_time:setTime,
+              resetPasswordExpires:setTime,
+              resetPasswordToken:token,
+            },
+        );
+        
+          }
+          values = {
+            email:req.body.email,
+            name:user.name
+        
+          };
+          let title="Reset Password Link";
+          let message ="\n\n Hello "+user.name+", \n\n You are receiving this email because we received a password reset request for your account.  \n\nEmail :  "+req.body.email+",\n\nReset Password code "+token+"\n\n If you did not request a password reset, no further action is required. ";
+          sendVerificationEmail(token ,values, res ,title,message);
+      });
+   
+    };
+
+async function sendVerificationEmail(token, req, res,title,message){
 
    try{
 
     let template="index";
-     let subject = "Account Verification Token";
+     let subject = title;
      let url=(req.headers) ? req.headers.host : process.env.APP_URL
      let name=(req.body) ? req.body.name : req.name;
      let to = (req.body) ? req.body.email : req.email;
      let from =  process.env.MAIL_FROM_ADDRESS;
      let link="<a href='http://"+url+"/api/auth/verify/"+token+"'>link</a> ";
      let code=token;
-     let html = "\n\n Hello "+name +",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+code+"  \n\n";  
+   
      
-    //    `<p>Hi ${req.body.name }<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
-    //  <br><p>If you did not request this, please ignore this email.</p>`;
+    //    `\n\nHi ${req.body.name }\n\n<br>\n\nPlease click on the following <a href="${link}">link</a> to verify your account.</p> 
+    //  <br>\n\nIf you did not request this, please ignore this email.</p>`;
       //'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \n' + link + '\n\nThank You!\n' ;
 
-    await sendMail(template,name,to, from, subject, html);
+    await sendMail(template,name,to, from, subject, message);
     res.status(200).send({ 
               status :  'TRUE',
               data:[{
@@ -322,6 +374,8 @@ async function sendVerificationEmail(token, req, res){
   }
 }
 
+
+
 module.exports={
-  verify,tokenDetails,signup,signin,resendEmail
+  verify,tokenDetails,signup,signin,resendEmail,resetPassowrdLink
 }

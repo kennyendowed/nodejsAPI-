@@ -1,6 +1,6 @@
 const db = require("../../models");
 const utils = require('../helpers/utils');
-const {resetLinkValidation,registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
+const {registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 var currentDate = new Date();
@@ -11,7 +11,14 @@ var currentDate = new Date();
 });
 
 verifyEmail = (req, res, next) => {
-  const { error } = resetLinkValidation(req.body);
+  var currentDate = new Date();
+  var currentDateTime = new Date(currentDate.getTime())
+  var datetimedata = currentDateTime
+.toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
+  const { error } = ResendOtpValidation(req.body);
+
   if(error) return res.status(400).json({
     status :  'FALSE',
     data:[{
@@ -20,7 +27,39 @@ verifyEmail = (req, res, next) => {
        }]   
   });
  
-  next();
+  User.findOne({
+    where: {
+      email: req.body.email
+    }
+  }).then(response => {
+    if (!response) {
+      res.status(404).send({
+        status :  'FALSE',
+        data:[{
+          code:  404,
+          message: "Data not found",
+           }]       
+      });
+      return;
+    }
+var myTIME=response.email_time.toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
+
+       if(myTIME  > datetimedata) {
+        res.status(404).send({
+          status :  'FALSE',
+          data:[{
+            code:  404,
+            message: " Please Try Again. After " + utils.differhuman(response.email_time),
+             }]       
+        });
+        return;
+    } 
+      next();
+  
+  });
+
 }
 
 verifyLogin = (req, res, next) => {
@@ -66,28 +105,11 @@ verifyResendOtp = (req, res, next) => {
       });
       return;
     }
-//console.log("my time from db",response.email_time)
-//console.log(response.email_time)
-      // console.log(utils.differhuman(response.email_time))
-      // console.log(response.email_time.toLocaleString('en-US', {
-      //   timeZone: 'Africa/Lagos'
-      // }))
-      // console.log(datetimedata.toLocaleString('en-US', {
-      //   timeZone: 'Africa/Lagos'
-      // }))
 var myTIME=response.email_time.toLocaleString('en-US', {
   timeZone: 'Africa/Lagos'
 });
-// var CurrentTime =datetimedata.toLocaleString('en-US', {
-//   timeZone: 'Africa/Lagos'
-// });
-      // console.log("my read able  time from db ",myTIME)
-      // console.log("my system current  time ",datetimedata)
-      
 
-      // var myTime = datetime.substr(11, 2)
        if(myTIME  > datetimedata) {
-       // console.log(response.email_time )
         res.status(404).send({
           status :  'FALSE',
           data:[{
