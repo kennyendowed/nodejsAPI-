@@ -5,7 +5,7 @@ const User_Login = db.User_Login;
 const Blacklist_Token = db.Blacklist_Token;
 
 verifyToken = (req, res, next) => {
-  let token =  req.headers["x-authorization"] || req.headers["authorization"];
+  let token =  req.headers["x-authorization"] || req.headers["authorization"] ;
 
   if (!token) {
     return res.status(403).send({
@@ -31,8 +31,8 @@ verifyToken = (req, res, next) => {
       });
     }
     else {
-  
-      jwt.verify(token, process.env.SECRET, (err, decoded) => {
+      const gtoken = token && token.split(' ')[1];
+      jwt.verify(gtoken, process.env.SECRET, (err, decoded) => {     
         if (err) {
           return res.status(401).send({
             status :  'FALSE',
@@ -46,10 +46,30 @@ verifyToken = (req, res, next) => {
         next();
       });
     }
- 
+   
   });
  
+  try {
+    const gtoken = token && token.split(' ')[1];
+    jwt.verify(gtoken, process.env.SECRET, async (err, decoded) => {
+    const currentUser = await User.findOne({where:{ user_id : decoded.user_id}})
+    req.currentUser = currentUser;
+    return next();
+  });
+  } catch (error) {
+    console.error(error);
+    return res.status(403).send({
+      status :  'FALSE',
+      data:[{
+        code:  403,
+        message: "Unauthorized Access - No Token Provided!"
+         }]        
+    });
+  }
+
 };
+
+
 
 logotToken = (req, res, next) => {
   let Atoken = req.headers["x-authorization"] || req.headers["authorization"];
@@ -142,6 +162,7 @@ isAdmin = (req, res, next) => {
 isStaff = (req, res, next) => {
   User.findByPk(req.userId).then(user => {
     user.getRoles().then(roles => {
+     
       for (let i = 0; i < roles.length; i++) {
         if (roles[i].name === "staff") {
           next();
@@ -177,6 +198,8 @@ isStaffOrAdmin = (req, res, next) => {
     });
   });
 };
+
+
 
 const authJwt = {
   verifyToken: verifyToken,

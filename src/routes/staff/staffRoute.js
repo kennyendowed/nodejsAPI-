@@ -13,12 +13,12 @@ router.use(function(req, res, next) {
   //  default route
 router.get("/",(req,res)=>{
     res.json({
-        message:"Welcome to Api Engine application.",
+        message:"Welcome to Staff Api Engine application.",
     });
 });
 
 
-router.get("staff", [authJwt.verifyToken, authJwt.isStaff],controller.staffBoard);
+router.get("/getallstaff", [authJwt.verifyToken, authJwt.isStaff],controller.staffBoard);
 
 
 

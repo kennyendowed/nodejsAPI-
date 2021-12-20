@@ -42,26 +42,16 @@ async function verify(req, res){
 async function signup(req, res){
 //exports.signup = async  (req, res) => {
   // generate token and save
-  var token =utils.token(4,'numeric'); 
- var minutesToAdd=5;
- var currentDate = new Date();
-
-var futureDate = new Date(currentDate.getTime() + minutesToAdd*60000 )
-var datetimedata = futureDate
-.toLocaleString('en-US', {
-  timeZone: 'Africa/Lagos'
-});
-// console.log(utils.formatDate(datetimedata))
-
-// console.log(utils.formatTime(datetimedata))
-
+  //var token =utils.token(4,'numeric'); 
+  var userID =utils.randomPin(8); 
   var token =utils.randomPin(4); 
   // Save User to Database
   User.create({
+    user_id:userID,
     name: req.body.name,
     username: req.body.username,
     email: req.body.email,
-    email_time:datetimedata,
+    email_time:utils.addMinutes(),
     email_code:token,
     password: bcrypt.hashSync(req.body.password, 8)
   })
@@ -100,11 +90,6 @@ var datetimedata = futureDate
 
    //  var  text= 'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' +req.body.email + '\/' + token + '\n\nThank You!\n' ;
     
-  
-
-   
-
-  
 
     })
     .catch(err => {
@@ -174,16 +159,18 @@ async function signin(req, res){
 
       var mail_val = {
         id: user.id,
+        user_id: user.user_id,
         email: user.email,
         name: user.name,
-        username: user.username
+        username: user.username,
+        email_verify:user.email_verify
       }; 
 
       var token = jwt.sign(mail_val, process.env.SECRET, {
         expiresIn: 86400 // 24 hours
       });
        User_Login.create({
-        user_id :  user.id,
+        user_id :  user.user_id,
         token_id : token_id,
         token_secret : token_secret ,
         ip_address : ip ,
@@ -228,17 +215,24 @@ async function tokenDetails(req, res){
            }]        
       });
     }
+    currentDateTime= new Date(decoded.exp * 1000);
+    var datetimedata = currentDateTime
+    .toLocaleString('en-US', {
+      timeZone: 'Africa/Lagos'
+    });
+
     res.status(200).send({ 
       status :  'TRUE',
       data:{
         code:  200,
         data: {
-          "id": decoded.id,
+          "id": parseInt(decoded.id),
           "email": decoded.email,
           "name":decoded.name,
           "username": decoded.username,
-          "iat": new Date(decoded.iat * 1000),
-          "exp": new Date(decoded.exp* 1000)
+          "email_verification": (decoded.email_verify === 0) ? "unverify" : "verify",
+          // "iat": new Date(decoded.iat * 1000),
+          "token_exp": datetimedata
         }
          }
          });
@@ -247,32 +241,71 @@ async function tokenDetails(req, res){
   });
 };
 async function resendEmail(req, res){
+  let values = {};
+   var token =utils.randomPin(4); 
+  User.findOne({
+    where:{
+      [Op.or]: [
+         { email:req.body.email}
+      ]
+    }
+  })
+    .then(user => {    
+       if (!user) {
+        return res.status(404).send({
+          status :  'FALSE',
+          data:[{
+            code:  404,
+            message: "User Not found.",
+             }]
 
+          });
+      }
+      else{
+       
+        user.update(
+          {
+            email_time:utils.addMinutes(),
+            email_code:token,
+          },
+      );
+      
+        }
+        values = {
+          email:req.body.email,
+          name:user.name
+      
+        };
+      
+         sendVerificationEmail(token ,values, res);
+    });
+ 
   };
 
 async function sendVerificationEmail(token, req, res){
-  try{
+
+   try{
 
     let template="index";
      let subject = "Account Verification Token";
-     let name=req.body.name;
-     let to = req.body.email;
-     let from = process.env.APP_NAME;
-     let link="<a href='http://"+req.headers.host+"/api/auth/verify/"+token+"'>link</a> ";
+     let url=(req.headers) ? req.headers.host : process.env.APP_URL
+     let name=(req.body) ? req.body.name : req.name;
+     let to = (req.body) ? req.body.email : req.email;
+     let from =  process.env.MAIL_FROM_ADDRESS;
+     let link="<a href='http://"+url+"/api/auth/verify/"+token+"'>link</a> ";
      let code=token;
-     let html = "\n\n Hello "+req.body.name +",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+code+"  \n\n";  
+     let html = "\n\n Hello "+name +",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : "+code+"  \n\n";  
      
     //    `<p>Hi ${req.body.name }<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
     //  <br><p>If you did not request this, please ignore this email.</p>`;
       //'Hello '+ req.body.name +',\n\n' + 'Please verify your account by clicking the link: \n' + link + '\n\nThank You!\n' ;
-  
 
     await sendMail(template,name,to, from, subject, html);
     res.status(200).send({ 
               status :  'TRUE',
               data:[{
                 code:  200,
-                data: 'A verification email has been sent to ' + req.body.email+ '. It will be expire after one day. If you not get verification Email click on resend token',
+                data: 'A verification email has been sent to ' + to+ '. It will be expire after one day. If you not get verification Email click on resend token',
                  }]
                  });
   

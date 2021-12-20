@@ -64,9 +64,14 @@ const ResendOtpValidation =(data)=>{
    return schema.validate(data);
 }
 
+//ResetLink Validation
+resetLinkValidation = (data)=>{
+
+}
+
 
 module.exports={
-  registerValidation,loginValidation,otpValidation,ResendOtpValidation
+  registerValidation,loginValidation,otpValidation,ResendOtpValidation,resetLinkValidation
 }
 // module.exports.registerValidation= registerValidation;
 // module.exports.loginValidation= loginValidation;

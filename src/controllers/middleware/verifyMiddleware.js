@@ -1,6 +1,6 @@
 const db = require("../../models");
 const utils = require('../helpers/utils');
-const {registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
+const {resetLinkValidation,registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 var currentDate = new Date();
@@ -10,6 +10,18 @@ var currentDate = new Date();
   timeZone: 'Africa/Lagos'
 });
 
+verifyEmail = (req, res, next) => {
+  const { error } = resetLinkValidation(req.body);
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
+ 
+  next();
+}
 
 verifyLogin = (req, res, next) => {
   const { error } = loginValidation(req.body);
@@ -24,12 +36,12 @@ verifyLogin = (req, res, next) => {
   next();
 }
 verifyResendOtp = (req, res, next) => {
-//   var currentDate = new Date();
-//   var currentDateTime = new Date(currentDate.getTime())
-//   var datetimedata = currentDateTime
-// .toLocaleString('en-US', {
-//   timeZone: 'Africa/Lagos'
-// });
+  var currentDate = new Date();
+  var currentDateTime = new Date(currentDate.getTime())
+  var datetimedata = currentDateTime
+.toLocaleString('en-US', {
+  timeZone: 'Africa/Lagos'
+});
   const { error } = ResendOtpValidation(req.body);
   if(error) return res.status(400).json({
     status :  'FALSE',
@@ -54,45 +66,33 @@ verifyResendOtp = (req, res, next) => {
       });
       return;
     }
-
-    // if ($user->email_time > Carbon::now())
-    // {
-    //     $tt = Carbon::parse($user->email_time)->diffForHumans();
-    //     return response()->json([
-    //       "status"  =>  FALSE,
-    //       'error'=>[
-    //         "message" =>'Please Try Again. After '.$tt,
-    //         "code"=>Response::HTTP_NOT_FOUND
-    //       ]
-    //     ],Response::HTTP_NOT_FOUND);
-    
-    // }
-
-      console.log(utils.differhuman(response.email_time))
-      console.log(response.email_time.toLocaleString('en-US', {
-        timeZone: 'Africa/Lagos'
-      }))
-      console.log(datetimedata.toLocaleString('en-US', {
-        timeZone: 'Africa/Lagos'
-      }))
+//console.log("my time from db",response.email_time)
+//console.log(response.email_time)
+      // console.log(utils.differhuman(response.email_time))
+      // console.log(response.email_time.toLocaleString('en-US', {
+      //   timeZone: 'Africa/Lagos'
+      // }))
+      // console.log(datetimedata.toLocaleString('en-US', {
+      //   timeZone: 'Africa/Lagos'
+      // }))
 var myTIME=response.email_time.toLocaleString('en-US', {
   timeZone: 'Africa/Lagos'
 });
-var CurrentTime =datetimedata.toLocaleString('en-US', {
-  timeZone: 'Africa/Lagos'
-});
-      // console.log(new Date(response.email_time))
-      // console.log(new Date(datetimedata))
+// var CurrentTime =datetimedata.toLocaleString('en-US', {
+//   timeZone: 'Africa/Lagos'
+// });
+      // console.log("my read able  time from db ",myTIME)
+      // console.log("my system current  time ",datetimedata)
       
 
       // var myTime = datetime.substr(11, 2)
-       if(myTIME  > CurrentTime) {
+       if(myTIME  > datetimedata) {
        // console.log(response.email_time )
         res.status(404).send({
           status :  'FALSE',
           data:[{
             code:  404,
-            message: "Please Try Again. After " + utils.differhuman(response.email_time),
+            message: " Please Try Again. After " + utils.differhuman(response.email_time),
              }]       
         });
         return;
@@ -103,8 +103,6 @@ var CurrentTime =datetimedata.toLocaleString('en-US', {
 
 
 }
-
-
 checkOtp = (req, res, next) => {
   
   const { error } = otpValidation(req.body);
@@ -219,12 +217,13 @@ checkRolesExisted = (req, res, next) => {
   next();
 };
 
-const verifySignUp = {
+const verifyMiddleware = {
   checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
   checkRolesExisted: checkRolesExisted,
-  verifyOtp:checkOtp,
+  VerifyOtp:checkOtp,
   Verifysignin:verifyLogin,
-  verifyResendOtp:verifyResendOtp
+  VerifyEmail:verifyEmail,
+  VerifyResendOtp:verifyResendOtp
 };
 
-module.exports = verifySignUp;
+module.exports = verifyMiddleware;

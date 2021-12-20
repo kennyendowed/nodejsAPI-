@@ -8,7 +8,8 @@ module.exports = (sequelize, Sequelize) => {
 			primaryKey: true
 		},
 		user_id: {
-			type: Sequelize.UUID,
+			type: Sequelize.STRING,
+			// type: Sequelize.UUID,
 			allowNull: false
 		},
 		logged_out: {

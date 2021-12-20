@@ -8,7 +8,7 @@ function differhuman(date) {
   let secs = (minutes % 1) * 60;
   [days, hours, minutes, secs] = [Math.floor(days), Math.floor(hours), Math.floor(minutes), Math.floor(secs)]
   
-  console.log(days+'d', hours+'h', minutes+'m', secs+'s');
+  //console.log(days+'d', hours+'h', minutes+'m', secs+'s');
 
   // // Make a fuzzy time
   // var delta = Math.round((+new Date - date) / 1000);
@@ -51,6 +51,21 @@ function differhuman(date) {
   // }
 return fuzzy;
 }
+
+
+function addMinutes(minutesToAdd= 5)
+{
+  
+  var currentDate = new Date();
+ 
+ var futureDate = new Date(currentDate.getTime() + minutesToAdd*60000 )
+ var datetimedata = futureDate
+ .toLocaleString('en-US', {
+   timeZone: 'Africa/Lagos'
+ });
+ return datetimedata;
+}
+
 
 function getPool(type) {
   var pool
@@ -127,4 +142,4 @@ function randomPin(length) {
 
 }
 
-module.exports = { formatDate, formatTime, token, randomPin ,differhuman };
+module.exports = { formatDate, formatTime, token, randomPin ,differhuman ,addMinutes};

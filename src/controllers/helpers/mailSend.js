@@ -50,7 +50,9 @@ const sendMail = (template,name,email, from,  subject, text) => {
        
             return err;
         }
+     
         return  data;
+  
     });
 }
 
