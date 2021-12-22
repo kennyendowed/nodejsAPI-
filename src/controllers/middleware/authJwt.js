@@ -3,10 +3,18 @@ const db = require("../../models");
 const User = db.user;
 const User_Login = db.User_Login;
 const Blacklist_Token = db.Blacklist_Token;
+let token;
 
-verifyToken = (req, res, next) => {
-  let token =  req.headers["x-authorization"] || req.headers["authorization"] ;
+// if (req.headers["authorization"].startsWith('Bearer ')) {
+//   // Read the ID Token from the Authorization header.
+//    token  = req.headers["authorization"].split('Bearer ')[1];
+// } else{
+//    token =  req.headers["x-authorization"];
+// }
 
+async function verifyToken  (req, res, next)  {
+
+  token = (req.headers["authorization"].startsWith('Bearer ')) ? req.headers["authorization"].split('Bearer ')[1] :req.headers["x-authorization"];  
   if (!token) {
     return res.status(403).send({
       status :  'FALSE',
@@ -18,7 +26,7 @@ verifyToken = (req, res, next) => {
   
   }
 
-  Blacklist_Token.findOne({ where: {token: token } })
+ await Blacklist_Token.findOne({ where: {token: token } })
   .then((found) => {
         
     if (found){
@@ -31,8 +39,8 @@ verifyToken = (req, res, next) => {
       });
     }
     else {
-      const gtoken = token && token.split(' ')[1];
-      jwt.verify(gtoken, process.env.SECRET, (err, decoded) => {     
+       
+      jwt.verify(token, process.env.SECRET, (err, decoded) => {     
         if (err) {
           return res.status(401).send({
             status :  'FALSE',
@@ -42,38 +50,38 @@ verifyToken = (req, res, next) => {
                }]        
           });
         }
-        req.userId = decoded.id;
-        next();
+        req.currentUser= decoded;
+         next();
+       
       });
     }
    
   });
  
-  try {
-    const gtoken = token && token.split(' ')[1];
-    jwt.verify(gtoken, process.env.SECRET, async (err, decoded) => {
-    const currentUser = await User.findOne({where:{ user_id : decoded.user_id}})
-    req.currentUser = currentUser;
-    return next();
-  });
-  } catch (error) {
-    console.error(error);
-    return res.status(403).send({
-      status :  'FALSE',
-      data:[{
-        code:  403,
-        message: "Unauthorized Access - No Token Provided!"
-         }]        
-    });
-  }
+//   try {
+
+//     jwt.verify(token, process.env.SECRET, async (err, decoded) => {
+//     //const currentUser = await User.findOne({where:{ user_id : decoded.user_id}})
+    
+//     console.log("MiddleWare " +req.currentUser.user_id)
+//     return next();
+//  });
+//   } 
+//   catch (error) {
+//     return res.status(403).send({
+//       status :  'FALSE',
+//       data:[{
+//         code:  403,
+//         message: "Unauthorized Access - No Token Provided!"
+//          }]        
+//     });
+//   }
 
 };
 
 
-
 logotToken = (req, res, next) => {
-  let Atoken = req.headers["x-authorization"] || req.headers["authorization"];
-  const token = Atoken && Atoken.split(' ')[1];
+  token = (req.headers["authorization"].startsWith('Bearer ')) ? req.headers["authorization"].split('Bearer ')[1] :req.headers["x-authorization"];  
   if (!token) {
     return res.status(403).send({
       status :  'FALSE',
@@ -113,7 +121,7 @@ logotToken = (req, res, next) => {
         }
      
         if(decoded){
-          const login = await User_Login.findOne({where:{ user_id : decoded.id}})
+          const login = await User_Login.findOne({where:{ user_id : decoded.user_id}})
           login.logged_out=true;
           login.token_deleted=true;
           await login.save();

@@ -33,6 +33,12 @@ router.post(
 );
 //reset-password-link for user account
 router.post("/resetPassword", [verifyMiddleware.VerifyEmail],controller.resetPassowrdLink);
+//reset-password-link for user account
+router.post("/passwordReset", [verifyMiddleware.VerifypasswordReset],controller.resetPassword);
+
+//save user device token
+router.post("/save-token", [authJwt.verifyToken,verifyMiddleware.VerifysaveToken],controller.saveToken);
+
 //Logout user
 router.post("/logout", [authJwt.logotToken]);
 //Get user details via token

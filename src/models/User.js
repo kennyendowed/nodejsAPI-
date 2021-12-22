@@ -18,6 +18,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    device_token: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     email: {
       type: Sequelize.STRING,
       allowNull: false,

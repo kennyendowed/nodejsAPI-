@@ -1,6 +1,6 @@
 const db = require("../../models");
 const utils = require('../helpers/utils');
-const {registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
+const {saveTokenValidation,passwordResetValidation,registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 var currentDate = new Date();
@@ -60,6 +60,48 @@ var myTIME=response.email_time.toLocaleString('en-US', {
   
   });
 
+}
+
+VerifypasswordReset = (req, res, next) => {
+  const { error } = passwordResetValidation(req.body);
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
+  User.findOne({
+    where: {
+      resetPasswordToken: req.body.token
+    }
+  }).then(response => {
+    if (!response) {
+      res.status(404).send({
+        status :  'FALSE',
+        data:[{
+          code:  404,
+          message: "Token  is incorrect",
+           }]       
+      });
+      return;
+    }
+      next();
+  
+  });
+}
+
+VerifysaveToken =(req, res, next) =>{
+  const { error } = saveTokenValidation(req.body);
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
+ 
+  next();
 }
 
 verifyLogin = (req, res, next) => {
@@ -245,7 +287,9 @@ const verifyMiddleware = {
   VerifyOtp:checkOtp,
   Verifysignin:verifyLogin,
   VerifyEmail:verifyEmail,
-  VerifyResendOtp:verifyResendOtp
+  VerifypasswordReset:VerifypasswordReset,
+  VerifyResendOtp:verifyResendOtp,
+  VerifysaveToken
 };
 
 module.exports = verifyMiddleware;

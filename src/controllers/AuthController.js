@@ -12,6 +12,7 @@ const Op = db.Sequelize.Op;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+
 async function verify(req, res){
   
   try{
@@ -112,9 +113,42 @@ async function signup(req, res){
          sendVerificationEmail(token ,values, res ,title,message);
 };
 
+async function resetPassword(req, res) {
+  User.findOne({
+    where:{
+      resetPasswordToken: req.body.token
+    }
+  })
+    .then(user => {
+      let setTime =utils.addMinutes();
+      var token =utils.randomPin(4); 
+      user.update(
+        {
+          resetPasswordExpires:setTime,
+          resetPasswordToken:token,
+          password: bcrypt.hashSync(req.body.password, 8)
+        }, );
+        values = {
+          email:user.email,
+          name:user.name
+      
+        };
+        let title="Reset Password Notification";
+        let message ="\n\n Hello "+user.name+", \n\n You are receiving this email because you just changed your account  password .  \n\nIf you did not request a password reset, please try to reset your password again  and also change the password to your personal email.  ";
+        sendVerificationEmail(token ,values, res ,title,message);
+        res.status(200).send({ 
+          status :  'TRUE',
+          data:[{
+            code:  200,
+            data: 'Password has been changed ',
+             }]
+             });
+    });
+}
+
 async function signin(req, res){
 //exports.signin = (req, res) => {
-  console.log(req.body)
+
   User.findOne({
     where:{
       [Op.or]: [
@@ -134,6 +168,7 @@ async function signin(req, res){
 
           });
       }
+     
       var passwordIsValid = bcrypt.compareSync(
         req.body.password,
         user.password
@@ -206,7 +241,46 @@ async function signin(req, res){
            }]   
 
        });
-    });
+    })
+};
+
+async function  saveToken  (req, res) {
+  var UserId = req.currentUser.user_id ;
+  //console.log(UserId)
+  try {
+      User.findOne({
+        where:{    
+           user_id: UserId  
+        }
+      })
+        .then(user => {    
+            user.update(
+              {
+                device_token: req.body.DeviceToken,
+              
+              },
+          );                      
+        });      
+          
+        return  res.status(200).send({ 
+            status :  'TRUE',
+            data:[{
+              code:  200,
+              data: 'Device Token saved successfully ',
+               }]
+               }); 
+                
+    } catch (error) {
+      return res.status(500).send({
+        status :  'FALSE',
+        data:[{
+          code:  500,
+          message: "Whoops, looks like something went wrong",
+          developerMessage: error.message,
+           }]       
+      });
+    }
+  
 };
 
 async function tokenDetails(req, res){
@@ -377,5 +451,5 @@ async function sendVerificationEmail(token, req, res,title,message){
 
 
 module.exports={
-  verify,tokenDetails,signup,signin,resendEmail,resetPassowrdLink
+  saveToken,verify,tokenDetails,signup,signin,resendEmail,resetPassowrdLink,resetPassword
 }
