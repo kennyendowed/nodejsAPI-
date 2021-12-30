@@ -18,7 +18,7 @@ router.get("/",(req,res)=>{
 });
 
 
-router.get("/getallstaff", [authJwt.verifyToken, authJwt.isStaff],controller.staffBoard);
+// router.get("/getallstaff", [authJwt.verifyToken, authJwt.isStaff],controller.staffBoard);
 
 
 

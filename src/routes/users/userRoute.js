@@ -18,8 +18,11 @@ router.get("/",(req,res)=>{
 });
 
 
-router.get("user",[authJwt.verifyToken], controller.userBoard);
-
+// router.get("user",[authJwt.verifyToken], controller.userBoard);
+router.get("/wallet",[authJwt.verifyToken], controller.userWallet);
+router.get("/getuserTransaction/:id",[authJwt.verifyToken], controller.getuserTransaction);
+router.post("/fundWallet/:id",[authJwt.verifyToken], controller.funduserWallet);
+router.post("/offer",[authJwt.verifyToken], controller.createOffer);
 
 
 

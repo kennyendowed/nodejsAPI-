@@ -3,6 +3,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
 const dotenv=require('dotenv');
+const fileUpload = require('express-fileupload');
 const app=express();
 dotenv.config();
 
@@ -17,6 +18,11 @@ var corsOptions = {
 
 //Middlewares
 app.use(express.json());
+// enable files upload
+app.use(fileUpload({
+  createParentPath: true
+}));
+app.use('/assets/uploads',express.static('assets/uploads'));
 
 
 

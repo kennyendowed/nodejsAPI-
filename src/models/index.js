@@ -1,7 +1,5 @@
 // const sql= require("./db.js");
 const config = require("../config/db.config.js");
-
-
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
     config.DB,
@@ -31,6 +29,10 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.Offers = require("../models/Offers.js")(sequelize, Sequelize);
+db.Reservations = require("../models/Reservation.js")(sequelize, Sequelize);
+db.Wallet = require("../models/Wallet.js")(sequelize, Sequelize);
+db.Transactions = require("../models/Transactions.js")(sequelize, Sequelize);
 db.user = require("../models/User.js")(sequelize, Sequelize);
 db.User_Login = require("../models/User_Login.js")(sequelize, Sequelize);
 db.role = require("../models/role.js")(sequelize, Sequelize);
@@ -49,6 +51,33 @@ db.user.belongsToMany(db.role, {
 db.User_Login.belongsTo(db.user, {
   as: "user_details",
   foreignKey: "userId",
+  constraints: false
+});
+
+db.Wallet.belongsTo(db.user, {
+  as: "user_wallets",
+  foreignKey: "user_id",
+  constraints: false
+});
+
+db.Transactions.belongsTo(db.Wallet, {
+  as: "wallets_details",
+  foreignKey: "user_id",
+  targetKey:'user_id',
+  constraints: false
+});
+
+db.Reservations.belongsTo(db.Offers, {
+  as: "Offers_details",
+  foreignKey: "offer_id",
+  targetKey:'offer_id',
+  constraints: false
+});
+
+db.Reservations.belongsTo(db.user, {
+  through: "user_details",
+  foreignKey: "user_id",
+  targetKey: "user_id",
   constraints: false
 });
 

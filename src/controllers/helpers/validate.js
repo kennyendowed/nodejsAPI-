@@ -4,16 +4,18 @@ const customJoi = Joi.extend(require("joi-age"));
 
 //Register validation
 const registerValidation= (data) =>{
-  //  const date18YearsAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 365 * 18);
+ const date18YearsAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 365 * 18);
 // try to validate the age larger than or equal to 18 years old
 
     const schema =Joi.object({
-        name: Joi.string().min(6).required(),
+      first_name: Joi.string().min(3).required(),
+      last_name: Joi.string().min(3).required(),
+      gender: Joi.string().min(1).required(),
         username: Joi.string().min(6).required(),
         email: Joi.string().min(6).email().required(),
         phone: Joi.number().required(),
-       // birthyear: Joi.date().max(date18YearsAgo),
-        birthyear: customJoi.date().minAge(18),
+      // dob: Joi.date().max(date18YearsAgo),
+        dob: customJoi.date().minAge(18),
         // birthyear: Joi.number().integer().min(1970).max(2013), 
         password: Joi.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,'password').min(6).max(15).required().messages({
             'string.pattern.base': '{{#label}} with value {:[.]} fails to match the required pattern: {{#regex}}',
@@ -91,7 +93,4 @@ const passwordResetValidation =(data)=>{
 
 module.exports={
   saveTokenValidation,registerValidation,loginValidation,otpValidation,ResendOtpValidation,passwordResetValidation
-}
-// module.exports.registerValidation= registerValidation;
-// module.exports.loginValidation= loginValidation;
-// module.exports.otpValidation=otpValidation;
+};

@@ -19,11 +19,11 @@ router.get("/",(req,res)=>{
 
 
 
-router.get(
-  "admin",
-  [authJwt.verifyToken, authJwt.isAdmin],
-  controller.adminBoard
-);
+// router.get(
+//   "admin",
+//   [authJwt.verifyToken, authJwt.isAdmin],
+//   controller.adminBoard
+// );
 
 
 

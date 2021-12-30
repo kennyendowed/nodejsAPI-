@@ -136,10 +136,21 @@ function formatDate(date) {
 }
 
 function randomPin(length) {
-  var a = Math.floor(100000 + Math.random() * 900000);
-  a = String(a);
-  return a = a.substring(0, length);
+  return Math.floor(Math.pow(10, length-1) + Math.random() * 9 * Math.pow(10, length-1));
 
 }
 
-module.exports = { formatDate, formatTime, token, randomPin ,differhuman ,addMinutes};
+function randomChar (length,type)
+{
+  var result           = '';
+  var characters       = getPool(type);
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+ }
+ return result;
+}
+
+
+
+module.exports = { formatDate,randomChar, formatTime, token, randomPin ,differhuman ,addMinutes};

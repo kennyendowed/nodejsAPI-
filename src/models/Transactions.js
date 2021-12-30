@@ -1,6 +1,6 @@
 
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("users", {
+  const Transactions = sequelize.define("Transactions", {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -10,66 +10,33 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    last_name: {
+    narrations: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    first_name: {
+    amount: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    gender: {
+    account_number: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    dob: {
+    transactionReference: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    username: {
+    type: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    device_token: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    email_code: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    email_time: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    email_verify: {
-      type: Sequelize.BIGINT,
-      allowNull: true,
-      defaultValue:0
-    },
-    resetPasswordToken: {
-      type: Sequelize.STRING,
-      allowNull: true,
-    },
-    resetPasswordExpires:{
-      type: Sequelize.DATE,
-      allowNull: true,
-    },
-    ip_address: {
+    date: {
       type: Sequelize.STRING,
       allowNull: true,
     },
   });
 
-  return User;
+  return Transactions;
 };
 
 
