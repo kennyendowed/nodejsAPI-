@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { verifyMiddleware } = require("../../controllers/middleware");
 const { authJwt } = require("../../controllers/middleware");
 const controller = require("../../controllers/UserController");
 
@@ -18,11 +19,23 @@ router.get("/",(req,res)=>{
 });
 
 
-// router.get("user",[authJwt.verifyToken], controller.userBoard);
+// Get request 
+router.get("/userProfile",[authJwt.verifyToken], controller.userProfile);
 router.get("/wallet",[authJwt.verifyToken], controller.userWallet);
 router.get("/getuserTransaction/:id",[authJwt.verifyToken], controller.getuserTransaction);
-router.post("/fundWallet/:id",[authJwt.verifyToken], controller.funduserWallet);
+router.get("/list-beneficiary",[authJwt.verifyToken], controller.getbeneficiary);
+router.get("/all-offers",[authJwt.verifyToken], controller.listOffer);
+router.get("/get-wishlist-reserved-history",[authJwt.verifyToken], controller.listOfferwishlist);
+router.delete("/delete-beneficiary/:id",[authJwt.verifyToken], controller.deletebeneficiary);
+
+
+//POST REQUEST
+router.put("/userUpdate/:id",[authJwt.verifyToken], controller.userUpdate);
+router.post("/fundWallet/:id",[authJwt.verifyToken,verifyMiddleware.VerifywalletInput], controller.funduserWallet);
 router.post("/offer",[authJwt.verifyToken], controller.createOffer);
+router.post("/reservation/:id",[authJwt.verifyToken], controller.createReservation);
+router.post("/confirmWatchlist/:id",[authJwt.verifyToken], controller.createWatchlist);
+router.post("/add-beneficiary",[authJwt.verifyToken,verifyMiddleware.VerifybeneficiaryInput], controller.createbeneficiary);
 
 
 

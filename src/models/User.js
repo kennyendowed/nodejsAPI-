@@ -30,6 +30,18 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    phone: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    avater: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    address: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     device_token: {
       type: Sequelize.STRING,
       allowNull: true,

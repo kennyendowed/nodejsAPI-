@@ -1,6 +1,6 @@
 const db = require("../../models");
 const utils = require('../helpers/utils');
-const {saveTokenValidation,passwordResetValidation,registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
+const {beneficiaryValidation,walletInputValidation,saveTokenValidation,passwordResetValidation,registerValidation,otpValidation,loginValidation,ResendOtpValidation} = require("../helpers/validate");
 const ROLES = db.role;
 const User = db.user;
 var currentDate = new Date();
@@ -60,7 +60,7 @@ var myTIME=response.email_time.toLocaleString('en-US', {
   
   });
 
-}
+};
 
 VerifypasswordReset = (req, res, next) => {
   const { error } = passwordResetValidation(req.body);
@@ -89,7 +89,7 @@ VerifypasswordReset = (req, res, next) => {
       next();
   
   });
-}
+};
 
 VerifysaveToken =(req, res, next) =>{
   const { error } = saveTokenValidation(req.body);
@@ -102,7 +102,8 @@ VerifysaveToken =(req, res, next) =>{
   });
  
   next();
-}
+};
+
 
 verifyLogin = (req, res, next) => {
   const { error } = loginValidation(req.body);
@@ -115,7 +116,7 @@ verifyLogin = (req, res, next) => {
   });
  
   next();
-}
+};
 verifyResendOtp = (req, res, next) => {
   var currentDate = new Date();
   var currentDateTime = new Date(currentDate.getTime())
@@ -281,6 +282,32 @@ checkRolesExisted = (req, res, next) => {
   next();
 };
 
+VerifywalletInput =(req, res, next) =>{
+  const { error } = walletInputValidation(req.body);
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
+ 
+  next();
+};
+
+VerifybeneficiaryInput =(req, res, next) =>{
+  const { error } = beneficiaryValidation(req.body);
+  if(error) return res.status(400).json({
+    status :  'FALSE',
+    data:[{
+      code:  400,
+      message: error.details[0].message,
+       }]   
+  });
+ 
+  next();
+};
+
 const verifyMiddleware = {
   checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
   checkRolesExisted: checkRolesExisted,
@@ -289,7 +316,9 @@ const verifyMiddleware = {
   VerifyEmail:verifyEmail,
   VerifypasswordReset:VerifypasswordReset,
   VerifyResendOtp:verifyResendOtp,
-  VerifysaveToken
+  VerifysaveToken:VerifysaveToken,
+  VerifywalletInput:VerifywalletInput,
+  VerifybeneficiaryInput:VerifybeneficiaryInput
 };
 
 module.exports = verifyMiddleware;

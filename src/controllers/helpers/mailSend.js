@@ -40,7 +40,7 @@ const sendMail = (template,name,email, from,  subject, text) => {
         name: name,
         message:text
     } ,
-    attachments: [{ filename: "logo.png", path: "./assets/logo.png" }],
+    attachments: [{ filename: "logo.png", path: "./assets/logo2.png" }],
     // send extra values to template
     };
   

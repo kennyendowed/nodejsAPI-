@@ -29,7 +29,9 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.Watchlists = require("../models/Watchlists.js")(sequelize, Sequelize);
 db.Offers = require("../models/Offers.js")(sequelize, Sequelize);
+db.Beneficiary = require("../models/Beneficiary.js")(sequelize, Sequelize);
 db.Reservations = require("../models/Reservation.js")(sequelize, Sequelize);
 db.Wallet = require("../models/Wallet.js")(sequelize, Sequelize);
 db.Transactions = require("../models/Transactions.js")(sequelize, Sequelize);
@@ -48,6 +50,13 @@ db.user.belongsToMany(db.role, {
   foreignKey: "userId",
   otherKey: "is_permission"
 });
+db.user.belongsTo(db.Wallet, {
+  as: "UserAccount",
+  foreignKey: "user_id",
+  targetKey:'user_id',
+  constraints: false
+});
+
 db.User_Login.belongsTo(db.user, {
   as: "user_details",
   foreignKey: "userId",
@@ -56,6 +65,13 @@ db.User_Login.belongsTo(db.user, {
 
 db.Wallet.belongsTo(db.user, {
   as: "user_wallets",
+  foreignKey: "user_id",
+  targetKey:'user_id',
+  constraints: false
+});
+
+db.Beneficiary.belongsTo(db.user, {
+  as: "user_beneficiary",
   foreignKey: "user_id",
   constraints: false
 });
@@ -78,6 +94,13 @@ db.Reservations.belongsTo(db.user, {
   through: "user_details",
   foreignKey: "user_id",
   targetKey: "user_id",
+  constraints: false
+});
+
+db.Watchlists.belongsTo(db.Offers, {
+  through: "watchlist",
+  foreignKey: "offer_id",
+  targetKey: "offer_id",
   constraints: false
 });
 

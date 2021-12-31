@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const sendMail = require("./mailSend");
 
 function differhuman(date) {
   let diffTime = Math.abs(new Date().valueOf() - new Date(date).valueOf());
@@ -151,6 +152,35 @@ function randomChar (length,type)
  return result;
 }
 
+ function sendsEMail(email, uname,  title, message) {
+  try {
+    let template = "index";
+    let subject = title;
+    let url =  process.env.APP_URL;
+    let name = uname;
+    let to = email;
+    let from = process.env.MAIL_FROM_ADDRESS;
+     sendMail(template, name, to, from, subject, message);
+    // res.status(200).send({
+    //   status: "TRUE",
+    
+    // });
+  } catch (err) {
+    console.log(err)
+    return false;
+    // return JSON.parse({
+    //   status: "FALSE",
+    //   data: [
+    //     {
+    //       code: 500,
+    //       message:
+    //         err.message ||
+    //         "Technical Issue!, Please click on resend for verify your Email.",
+    //     },
+    //   ],
+    // });
+    
+  }
+}
 
-
-module.exports = { formatDate,randomChar, formatTime, token, randomPin ,differhuman ,addMinutes};
+module.exports = {sendsEMail, formatDate,randomChar, formatTime, token, randomPin ,differhuman ,addMinutes};

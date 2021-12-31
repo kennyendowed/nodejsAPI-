@@ -28,7 +28,7 @@ const registerValidation= (data) =>{
     });
    
        return schema.validate(data);
-}
+};
 
 //Login validation
 const loginValidation= (data) =>{
@@ -41,7 +41,7 @@ const loginValidation= (data) =>{
     });
    
        return schema.validate(data);
-}
+};
 
 //Otp validation
 const otpValidation= (data) =>{
@@ -54,7 +54,7 @@ const otpValidation= (data) =>{
   });
  
      return schema.validate(data);
-}
+};
 
 //saveToken Validation
 const saveTokenValidation =(data)=>{
@@ -63,7 +63,7 @@ const saveTokenValidation =(data)=>{
 });
 
    return schema.validate(data);
-}
+};
 
 //ResendOtp Validation
 const ResendOtpValidation =(data)=>{
@@ -72,7 +72,8 @@ const ResendOtpValidation =(data)=>{
 });
 
    return schema.validate(data);
-}
+};
+
 //password rest Validation
 const passwordResetValidation =(data)=>{
   const schema =Joi.object({
@@ -88,9 +89,33 @@ const passwordResetValidation =(data)=>{
 });
 
    return schema.validate(data);
+};
+
+//wallet creation verify
+const walletInputValidation = (data) => {
+  const schema =Joi.object({
+    narrations: Joi.string().min(3).required(),
+    amount: Joi.number().required(),
+    transactionReference: Joi.string().min(1).required(),
+      date: Joi.string().required(),
+ 
+  });
+ 
+     return schema.validate(data);
+};
+//beneficiary Validation
+const beneficiaryValidation = (data) => {
+  const schema =Joi.object({
+    name: Joi.string().min(3).required(),
+    number: Joi.number().min(10).required(),
+ 
+  });
+ 
+     return schema.validate(data);
 }
 
 
+
 module.exports={
-  saveTokenValidation,registerValidation,loginValidation,otpValidation,ResendOtpValidation,passwordResetValidation
+  beneficiaryValidation,walletInputValidation,saveTokenValidation,registerValidation,loginValidation,otpValidation,ResendOtpValidation,passwordResetValidation
 };

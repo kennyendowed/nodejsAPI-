@@ -121,7 +121,7 @@ req.connection.socket.remoteAddress;
   let message =
     "\n\n Hello " +
     req.body.first_name +' '+ req.body.last_name +
-    ",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : " +
+    ",\n\n Welcome you to Demand Supply  as we hope to serve you better. \n\n OTP : " +
     token +
     "  \n\n";
  sendVerificationEmail(token, values, res, title, message);
@@ -391,7 +391,7 @@ async function resendEmail(req, res) {
     let message =
       "\n\n Hello " +
       user.name +
-      ",\n\n Welcome you to Bloomer  as we hope to serve you better. \n\n OTP : " +
+      ",\n\n Welcome you to Demand Supply  as we hope to serve you better. \n\n OTP : " +
       token +
       "  \n\n";
     sendVerificationEmail(token, values, res, title, message);
